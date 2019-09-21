@@ -27,7 +27,7 @@ import packageInfo from '../packageInfo';
 /**
  * Import the okta-auth-js library
  */
-import * as OktaAuth from '@okta/okta-auth-js';
+import OktaAuth from '@okta/okta-auth-js';
 import { Observable, Observer } from 'rxjs';
 
 @Injectable()
@@ -38,11 +38,6 @@ export class OktaAuthService {
     $authenticationState: Observable<boolean>;
 
     constructor(@Inject(OKTA_CONFIG) private auth: OktaConfig, private router: Router) {
-      // Assert Configuration
-      assertIssuer(auth.issuer, auth.testing);
-      assertClientId(auth.clientId);
-      assertRedirectUri(auth.redirectUri)
-
       this.observers = [];
 
       /**
@@ -56,6 +51,11 @@ export class OktaAuthService {
        */
 
       this.scrubScopes(this.config.scopes);
+
+      // Assert Configuration
+      assertIssuer(this.config.issuer, this.config.testing);
+      assertClientId(this.config.clientId);
+      assertRedirectUri(this.config.redirectUri);
 
       this.oktaAuth = new OktaAuth(this.config);
       this.oktaAuth.userAgent = `${packageInfo.name}/${packageInfo.version} ${this.oktaAuth.userAgent}`;
